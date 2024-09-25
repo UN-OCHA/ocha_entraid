@@ -1,0 +1,25 @@
+ocha_uimc.settings:
+  type: config_object
+  label: 'OCHA UIMC settings'
+  mapping:
+    token_url:
+      type: string
+      label: 'The API URL to get an access token.'
+    registration_url:
+      type: string
+      label: 'The API URL to register an account.'
+    username:
+      type: string
+      label: 'The API user name.'
+    password:
+      type: string
+      label: 'The API user password.'
+    consumer_key:
+      type: string
+      label: 'The API consumer key.'
+    consumer_secret:
+      type: string
+      label: 'The API consumer secret.'
+    verify_ssl:
+      type: bool
+      label: 'Whether to verify SSL or not when querying the API. Useful for local/dev tests.'

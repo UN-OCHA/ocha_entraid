@@ -1,0 +1,42 @@
+{
+    "name": "unocha/ocha_uimc",
+    "description": "OCHA UIMC module",
+    "type": "drupal-module",
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "UNOCHA",
+            "role": ""
+        }
+    ],
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://packages.drupal.org/8"
+        }
+    ],
+    "require": {
+        "php": ">=8.3",
+        "drupal/core": "^10",
+        "drupal/honeypot": "^2",
+        "drupal/key": "^1"
+    },
+    "require-dev": {
+        "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+        "drupal/coder": "^8.3",
+        "phpcompatibility/php-compatibility": "^9.3"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    },
+    "scripts": {
+        "phpcs": "vendor/bin/phpcs -p .",
+        "phpcbf": "vendor/bin/phpcbf -p .",
+        "test": [
+            "@phpcs"
+        ]
+    }
+}
