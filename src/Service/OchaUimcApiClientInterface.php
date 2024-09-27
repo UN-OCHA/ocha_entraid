@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\mymodule\Service;
+namespace Drupal\ocha_uimc\Service;
 
 /**
  * Interface for the client service for the UIMC API.

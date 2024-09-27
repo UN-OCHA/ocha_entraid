@@ -6,6 +6,7 @@ namespace Drupal\ocha_uimc\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Markup;
 use Drupal\honeypot\HoneypotService;
 use Drupal\ocha_uimc\Service\OchaUimcApiClientInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -42,12 +43,24 @@ class OchaUimcRegistrationForm extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state): array {
+    // Add the registration explanation message.
+    $explanation = $this->config('ocha_uimc.settings')->get('registration_explanation');
+    if (!empty($explanation)) {
+      $form['registration_explanation'] = [
+        '#type' => 'markup',
+        '#markup' => Markup::create($explanation),
+        '#prefix' => '<div class="ocha-uimc-registration-explanation">',
+        '#suffix' => '</div>',
+      ];
+    }
+
     $form['first_name'] = [
       '#type' => 'textfield',
       '#title' => $this->t('First Name'),
       '#required' => TRUE,
       '#maxlength' => 30,
       '#placeholder' => $this->t('Enter your first name'),
+      '#description' => $this->t('Enter your first name using only letters, spaces, hyphens, or apostrophes. Maximum 30 characters.'),
     ];
 
     $form['last_name'] = [
@@ -56,6 +69,7 @@ class OchaUimcRegistrationForm extends FormBase {
       '#required' => TRUE,
       '#maxlength' => 30,
       '#placeholder' => $this->t('Enter your last name'),
+      '#description' => $this->t('Enter your last name using only letters, spaces, hyphens, or apostrophes. Maximum 30 characters.'),
     ];
 
     $form['email'] = [
@@ -64,6 +78,7 @@ class OchaUimcRegistrationForm extends FormBase {
       '#required' => TRUE,
       '#maxlength' => 100,
       '#placeholder' => $this->t('Enter your email address'),
+      '#description' => $this->t('Enter a valid email address. Only letters, numbers, hyphens, and periods are allowed. Maximum 100 characters.'),
     ];
 
     $form['actions']['#type'] = 'actions';
@@ -103,9 +118,8 @@ class OchaUimcRegistrationForm extends FormBase {
     if (strlen($email) > 100 || preg_match('/^[a-zA-Z0-9.-]{1,64}@[a-zA-Z0-9.-]{1,255}$/', $email) !== 1) {
       $form_state->setErrorByName('email', $this->t('Email must contain only letters, numbers, hyphens, or periods and be no longer than 100 characters.'));
     }
-
     // Additional email validation.
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    elseif (!filter_var($email, \FILTER_VALIDATE_EMAIL)) {
       $form_state->setErrorByName('email', $this->t('Please enter a valid email address.'));
     }
   }

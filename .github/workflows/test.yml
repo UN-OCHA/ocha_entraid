@@ -62,7 +62,7 @@ jobs:
       - name: Install Coder module
         run: |
           composer --dev --no-interaction --no-progress require \
-            drupal/coder:8.3.13 phpunit/phpunit
+            drupal/coder:^8.3 phpunit/phpunit
 
       - name: Define DRUPAL_ROOT env variable
         run: |

@@ -20,6 +20,15 @@ ocha_uimc.settings:
     consumer_secret:
       type: string
       label: 'The API consumer secret.'
+    send_email:
+      type: boolean
+      label: 'Whether or not have an email sent after registration.'
     verify_ssl:
-      type: bool
+      type: boolean
       label: 'Whether to verify SSL or not when querying the API. Useful for local/dev tests.'
+    request_timeout:
+      type: integer
+      label: 'Timeout for requests to the UIMC API.'
+    registration_explanation:
+      type: string
+      label: 'Explanation about the registration. Simple HTML is accepted.'
