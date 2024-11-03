@@ -4,6 +4,5 @@ description: 'Provides MS EntraID integration.'
 package: ocha
 core_version_requirement: ^10 || ^11
 dependencies:
-  - drupal:file
   - honeypot:honeypot
   - openid_connect_windows_aad:openid_connect_windows_aad
