@@ -1,8 +1,0 @@
-ocha_uimc.registration_form:
-  path: '/user/register/uimc'
-  defaults:
-    _form: '\Drupal\ocha_uimc\Form\OchaUimcRegistrationForm'
-    _title: 'Register account'
-  requirements:
-    _user_is_logged_in: 'FALSE'
-    _permission: access ocha uimc registration form

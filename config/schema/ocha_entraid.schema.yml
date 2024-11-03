@@ -1,0 +1,53 @@
+ocha_entraid.settings:
+  type: config_object
+  label: 'OCHA EntraID settings'
+  mapping:
+    uimc_api:
+      type: mapping
+      label: 'UIMC API settings.'
+      mapping:
+        token_url:
+          type: string
+          label: 'The API URL to get an access token.'
+        registration_url:
+          type: string
+          label: 'The API URL to register an account.'
+        user_details_url:
+          type: string
+          label: 'The API URL to get details about an account.'
+        group_management_url:
+          type: string
+          label: 'The API URL to add/remove an account from a group.'
+        username:
+          type: string
+          label: 'The API user name.'
+        password:
+          type: string
+          label: 'The API user password.'
+        consumer_key:
+          type: string
+          label: 'The API consumer key.'
+        consumer_secret:
+          type: string
+          label: 'The API consumer secret.'
+        send_email:
+          type: boolean
+          label: 'Whether or not have an email sent after registration.'
+        verify_ssl:
+          type: boolean
+          label: 'Whether to verify SSL or not when querying the API. Useful for local/dev tests.'
+        request_timeout:
+          type: integer
+          label: 'Timeout for requests to the UIMC API.'
+        default_group:
+          type;: string
+          label: 'The default group to which add accounts allowed to log in the site.'
+        encryption_key:
+          type;: string
+          label: '256 bits encryption key used to encrypt the access tokens.'
+    login_explanation:
+      type: string
+      label: 'Explanation about the sign in process. Simple HTML is accepted.'
+    registration_explanation:
+      type: string
+      label: 'Explanation about the registration process. Simple HTML is accepted.'

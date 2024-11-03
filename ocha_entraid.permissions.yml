@@ -1,0 +1,7 @@
+access ocha entraid registration form:
+  title: 'Access OCHA EntraID registration form'
+  description: 'Allow users to access OCHA EntraID registration form.'
+
+access ocha entraid login form:
+  title: 'Access OCHA EntraID login form'
+  description: 'Allow users to access OCHA EntraID login form.'

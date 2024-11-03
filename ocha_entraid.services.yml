@@ -1,9 +1,9 @@
 services:
-  ocha_uimc.api.client:
-    class: Drupal\ocha_uimc\Service\OchaUimcApiClient
+  ocha_entraid.uimc.api.client:
+    class: Drupal\ocha_entraid\Service\UimcApiClient
     arguments:
       - '@http_client'
       - '@config.factory'
-      - '@key.repository'
       - '@logger.factory'
+      - '@state'
       - '@datetime.time'

@@ -1,0 +1,17 @@
+ocha_entraid.form.registration:
+  path: '/user/register/entraid'
+  defaults:
+    _form: '\Drupal\ocha_entraid\Form\RegistrationForm'
+    _title: 'Register account'
+  requirements:
+    _user_is_logged_in: 'FALSE'
+    _permission: access ocha entraid registration form
+
+ocha_entraid.form.login:
+  path: '/user/login/entraid'
+  defaults:
+    _form: '\Drupal\ocha_entraid\Form\LoginForm'
+    _title: 'Sign in'
+  requirements:
+    _user_is_logged_in: 'FALSE'
+    _permission: access ocha entraid login form

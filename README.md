@@ -1,4 +1,6 @@
-OCHA UIMC
-=========
+OCHA EntraID
+============
 
-Integration with the UIMC API to allow the registration of new accounts.
+Integration with MS EntraID to login or register new accounts.
+
+This module provides a `/user/login/entraid` route to a sign in page and a `/user/register/entraid` route to a registration page.

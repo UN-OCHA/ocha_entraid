@@ -1,0 +1,9 @@
+type: module
+name: OCHA EntraID
+description: 'Provides MS EntraID integration.'
+package: ocha
+core_version_requirement: ^10 || ^11
+dependencies:
+  - honeypot:honeypot
+  - key:key
+  - openid_connect_windows_aad:openid_connect_windows_aad

@@ -1,0 +1,18 @@
+uimc_api:
+  token_url: ''
+  registration_url: ''
+  user_details_url: ''
+  group_management_url: ''
+  username: ''
+  password: ''
+  consumer_key: ''
+  consumer_secret: ''
+  send_email: true
+  verify_ssl: true
+  request_timeout: 10
+  default_group: ''
+  encryption_key: ''
+login_explanation: |
+  <p>Please enter your email address to access your account</p>
+registration_explanation: |
+  <p>Create an account to easily access our services.<br>If you already possess a UN email address, please <a href="/user/login/entraid">log in here</a> directly.</p>
