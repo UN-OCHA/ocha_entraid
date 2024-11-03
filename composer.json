@@ -1,6 +1,6 @@
 {
-    "name": "unocha/ocha_uimc",
-    "description": "OCHA UIMC module",
+    "name": "unocha/ocha_entraid",
+    "description": "OCHA EntraID module",
     "type": "drupal-module",
     "license": "GPL-2.0-or-later",
     "authors": [
@@ -19,7 +19,8 @@
         "php": ">=8.3",
         "drupal/core": "^10",
         "drupal/honeypot": "^2",
-        "drupal/key": "^1"
+        "drupal/openid_connect": "dev-3.x",
+        "drupal/openid_connect_windows_aad": "^2.0@beta"
     },
     "require-dev": {
         "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
@@ -38,5 +39,7 @@
         "test": [
             "@phpcs"
         ]
-    }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }

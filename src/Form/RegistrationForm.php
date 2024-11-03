@@ -2,30 +2,30 @@
 
 declare(strict_types=1);
 
-namespace Drupal\ocha_uimc\Form;
+namespace Drupal\ocha_entraid\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Markup;
 use Drupal\honeypot\HoneypotService;
-use Drupal\ocha_uimc\Service\OchaUimcApiClientInterface;
+use Drupal\ocha_entraid\Service\UimcApiClientInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Registration form for the Ocha UIMC module.
+ * Registration form.
  */
-class OchaUimcRegistrationForm extends FormBase {
+class RegistrationForm extends FormBase {
 
   /**
    * Constructor.
    *
-   * @param \Drupal\ocha_uimc\Service\OchaUimcApiClientInterface $ochaUimcApiClient
+   * @param \Drupal\ocha_entraid\Service\UimcApiClientInterface $uimcApiClient
    *   The OCHA UIMC API client.
    * @param \Drupal\honeypot\HoneypotService $honeypotService
    *   The Honeypot service.
    */
   public function __construct(
-    protected OchaUimcApiClientInterface $ochaUimcApiClient,
+    protected UimcApiClientInterface $uimcApiClient,
     protected HoneypotService $honeypotService,
   ) {}
 
@@ -34,7 +34,7 @@ class OchaUimcRegistrationForm extends FormBase {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('ocha_uimc.api.client'),
+      $container->get('ocha_entraid.uimc.api.client'),
       $container->get('honeypot')
     );
   }
@@ -44,12 +44,12 @@ class OchaUimcRegistrationForm extends FormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state): array {
     // Add the registration explanation message.
-    $explanation = $this->config('ocha_uimc.settings')->get('registration_explanation');
+    $explanation = $this->config('ocha_entraid.settings')->get('registration_explanation');
     if (!empty($explanation)) {
       $form['registration_explanation'] = [
         '#type' => 'markup',
         '#markup' => Markup::create($explanation),
-        '#prefix' => '<div class="ocha-uimc-registration-explanation">',
+        '#prefix' => '<div class="ocha-entraid-registration-explanation">',
         '#suffix' => '</div>',
       ];
     }
@@ -132,11 +132,17 @@ class OchaUimcRegistrationForm extends FormBase {
     $last_name = $form_state->getValue('last_name');
     $email = $form_state->getValue('email');
 
-    if ($this->ochaUimcApiClient()->registerAccount($first_name, $last_name, $email)) {
+    // Register the account.
+    try {
+      $this->uimcApiClient->registerAccount($first_name, $last_name, $email);
+
       $this->messenger()->addStatus($this->t('Registration successful, please check your mailbox for further instructions.'));
+
       $form_state->setRedirect('user.login');
     }
-    else {
+    catch (\Exception $exception) {
+      $this->getLogger('ocha_entraid')->error('Registration failed: @message', ['@message' => $exception->getMessage()]);
+
       $this->messenger()->addError($this->t('Registration failed, please contact the administrator or try again later.'));
     }
   }
@@ -145,17 +151,7 @@ class OchaUimcRegistrationForm extends FormBase {
    * {@inheritdoc}
    */
   public function getFormId(): string {
-    return 'ocha_uimc_registration_form';
-  }
-
-  /**
-   * Get the OCHA UIMC API client.
-   *
-   * @return \Drupal\ocha_uimc\Service\OchaUimcApiClientInterface
-   *   The OCHA UIMC API client.
-   */
-  protected function ochaUimcApiClient(): OchaUimcApiClientInterface {
-    return $this->ochaUimcApiClient;
+    return 'ocha_entraid_registration_form';
   }
 
 }
