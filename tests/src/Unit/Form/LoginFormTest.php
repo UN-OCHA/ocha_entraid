@@ -371,7 +371,7 @@ class LoginFormTest extends UnitTestCase {
   }
 
   /**
-   * Tests the form submission with successful EntraID client.
+   * Tests the form submission with successful Entra ID client.
    *
    * @covers ::submitForm
    */
@@ -381,21 +381,27 @@ class LoginFormTest extends UnitTestCase {
     $form_state->clearErrors();
     $form_state->setValues(['email' => 'user@example.com']);
 
-    $storage = $this->createMock(EntityStorageInterface::class);
-    $this->entityTypeManager->expects($this->once())
-      ->method('getStorage')
-      ->with('openid_connect_client')
-      ->willReturn($storage);
+    $response = new RedirectResponse('/dummy-url');
+
+    $plugin = $this->createMock(OpenIDConnectClientInterface::class);
+    $plugin->expects($this->once())
+      ->method('authorize')
+      ->willReturn($response);
 
     $client = $this->createMock(OpenIDConnectClientEntityInterface::class);
+    $client->expects($this->once())
+      ->method('getPlugin')
+      ->willReturn($plugin);
+
+    $storage = $this->createMock(EntityStorageInterface::class);
     $storage->expects($this->once())
       ->method('loadByProperties')
       ->willReturn(['entraid' => $client]);
 
-    $plugin = $this->createMock(OpenIDConnectClientInterface::class);
-    $client->expects($this->once())
-      ->method('getPlugin')
-      ->willReturn($plugin);
+    $this->entityTypeManager->expects($this->once())
+      ->method('getStorage')
+      ->with('openid_connect_client')
+      ->willReturn($storage);
 
     $this->openIdConnectClaims->expects($this->once())
       ->method('getScopes')
@@ -405,18 +411,13 @@ class LoginFormTest extends UnitTestCase {
       ->method('saveOp')
       ->with('login');
 
-    $response = new RedirectResponse('/dummy-url');
-    $plugin->expects($this->once())
-      ->method('authorize')
-      ->willReturn($response);
-
     $this->form->submitForm($form, $form_state);
 
     $this->assertInstanceOf(RedirectResponse::class, $form_state->getResponse());
   }
 
   /**
-   * Tests the form submission with successful EntraID client and login_hint.
+   * Tests the form submission with successful Entra ID client and login_hint.
    *
    * @covers ::submitForm
    */
@@ -427,21 +428,31 @@ class LoginFormTest extends UnitTestCase {
     $email = 'user@example.com';
     $form_state->setValues(['email' => $email]);
 
-    $storage = $this->createMock(EntityStorageInterface::class);
-    $this->entityTypeManager->expects($this->once())
-      ->method('getStorage')
-      ->with('openid_connect_client')
-      ->willReturn($storage);
+    $response = new RedirectResponse('/dummy-url');
+
+    $plugin = $this->createMock(OpenIDConnectClientInterface::class);
+    $plugin->expects($this->once())
+      ->method('authorize')
+      ->with(
+        $this->anything(),
+        $this->equalTo(['login_hint' => $email])
+      )
+      ->willReturn($response);
 
     $client = $this->createMock(OpenIDConnectClientEntityInterface::class);
+    $client->expects($this->once())
+      ->method('getPlugin')
+      ->willReturn($plugin);
+
+    $storage = $this->createMock(EntityStorageInterface::class);
     $storage->expects($this->once())
       ->method('loadByProperties')
       ->willReturn(['entraid' => $client]);
 
-    $plugin = $this->createMock(OpenIDConnectClientInterface::class);
-    $client->expects($this->once())
-      ->method('getPlugin')
-      ->willReturn($plugin);
+    $this->entityTypeManager->expects($this->once())
+      ->method('getStorage')
+      ->with('openid_connect_client')
+      ->willReturn($storage);
 
     $this->openIdConnectClaims->expects($this->once())
       ->method('getScopes')
@@ -451,22 +462,13 @@ class LoginFormTest extends UnitTestCase {
       ->method('saveOp')
       ->with('login');
 
-    $response = new RedirectResponse('/dummy-url');
-    $plugin->expects($this->once())
-      ->method('authorize')
-      ->with(
-        $this->anything(),
-        $this->equalTo(['login_hint' => $email])
-      )
-      ->willReturn($response);
-
     $this->form->submitForm($form, $form_state);
 
     $this->assertInstanceOf(RedirectResponse::class, $form_state->getResponse());
   }
 
   /**
-   * Tests the form submission with missing EntraID client.
+   * Tests the form submission with missing Entra ID client.
    *
    * @covers ::submitForm
    */

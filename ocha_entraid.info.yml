@@ -1,6 +1,6 @@
 type: module
-name: OCHA EntraID
-description: 'Provides MS EntraID integration.'
+name: OCHA Entra ID
+description: 'Provides MS Entra ID integration.'
 package: ocha
 core_version_requirement: ^10 || ^11
 dependencies:
