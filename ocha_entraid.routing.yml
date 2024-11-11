@@ -15,3 +15,12 @@ ocha_entraid.form.login:
   requirements:
     _user_is_logged_in: 'FALSE'
     _permission: access ocha entraid login form
+
+ocha_entraid.login:
+  path: '/user/login/entraid-direct'
+  defaults:
+    _controller: '\Drupal\ocha_entraid\Controller\DirectLoginController::redirectLogin'
+    _title: 'Log in'
+  requirements:
+    _user_is_logged_in: 'FALSE'
+    _permission: access ocha entraid direct login

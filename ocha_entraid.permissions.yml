@@ -1,7 +1,11 @@
 access ocha entraid registration form:
-  title: 'Access OCHA EntraID registration form'
-  description: 'Allow users to access OCHA EntraID registration form.'
+  title: 'Access OCHA Entra ID registration form'
+  description: 'Allow users to access OCHA Entra ID registration form.'
 
 access ocha entraid login form:
-  title: 'Access OCHA EntraID login form'
-  description: 'Allow users to access OCHA EntraID login form.'
+  title: 'Access OCHA Entra ID login form'
+  description: 'Allow users to access OCHA Entra ID login form.'
+
+access ocha entraid direct login:
+  title: 'Access OCHA Entra ID direct login'
+  description: 'Allow users to login via Entra ID without the intermediate login form.'
