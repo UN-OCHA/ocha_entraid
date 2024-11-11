@@ -125,10 +125,10 @@ class LoginForm extends FormBase {
 
     // Check if there is already an account with that email address and if it
     // is blocked, in which case we show an error.
-    $user = $this->entityTypeManager->getStorage('user')->loadByProperties([
+    $users = $this->entityTypeManager->getStorage('user')->loadByProperties([
       'mail' => $email,
     ]);
-    if (isset($user) && $user->isBlocked()) {
+    if (!empty($users) && reset($users)->isBlocked()) {
       $form_state->setErrorByName('', UserMessage::LOGIN_ACCOUNT_BLOCKED->label());
       return;
     }

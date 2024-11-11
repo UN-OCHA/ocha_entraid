@@ -250,7 +250,7 @@ class LoginFormTest extends UnitTestCase {
     $storage = $this->createMock(EntityStorageInterface::class);
     $storage->expects($this->once())
       ->method('loadByProperties')
-      ->willReturn($user);
+      ->willReturn([$user]);
 
     $this->entityTypeManager->expects($this->once())
       ->method('getStorage')
@@ -317,7 +317,7 @@ class LoginFormTest extends UnitTestCase {
     $storage = $this->createMock(EntityStorageInterface::class);
     $storage->expects($this->once())
       ->method('loadByProperties')
-      ->willReturn($user);
+      ->willReturn([$user]);
 
     $this->entityTypeManager->expects($this->once())
       ->method('getStorage')
@@ -355,7 +355,7 @@ class LoginFormTest extends UnitTestCase {
     $storage = $this->createMock(EntityStorageInterface::class);
     $storage->expects($this->once())
       ->method('loadByProperties')
-      ->willReturn($user);
+      ->willReturn([$user]);
 
     $this->entityTypeManager->expects($this->once())
       ->method('getStorage')
