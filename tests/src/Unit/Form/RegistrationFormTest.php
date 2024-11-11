@@ -320,7 +320,7 @@ class RegistrationFormTest extends UnitTestCase {
 
     $this->form->submitForm($form, $form_state);
 
-    $this->assertEquals('user.login', $form_state->getRedirect()->getRouteName());
+    $this->assertEquals('ocha_entraid.form.login', $form_state->getRedirect()->getRouteName());
   }
 
   /**
@@ -371,7 +371,7 @@ class RegistrationFormTest extends UnitTestCase {
 
     $this->form->submitForm($form, $form_state);
 
-    $this->assertEquals('user.login', $form_state->getRedirect()->getRouteName());
+    $this->assertEquals('ocha_entraid.form.login', $form_state->getRedirect()->getRouteName());
   }
 
   /**

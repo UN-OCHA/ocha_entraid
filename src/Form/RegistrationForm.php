@@ -143,7 +143,7 @@ class RegistrationForm extends FormBase {
         $this->messenger()->addStatus(UserMessage::REGISTRATION_SUCCESS_WITH_EMAIL->label());
       }
 
-      $form_state->setRedirect('user.login');
+      $form_state->setRedirect('ocha_entraid.form.login');
     }
     catch (\Exception $exception) {
       $this->getLogger('ocha_entraid')->error('Registration failed: @message', ['@message' => $exception->getMessage()]);
