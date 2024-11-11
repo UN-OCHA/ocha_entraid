@@ -7,9 +7,9 @@ namespace Drupal\ocha_entraid\Form;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Render\Markup;
 use Drupal\Core\Url;
 use Drupal\honeypot\HoneypotService;
+use Drupal\ocha_entraid\Enum\UserMessage;
 use Drupal\ocha_entraid\Exception\AccountNotFoundException;
 use Drupal\ocha_entraid\Service\UimcApiClientInterface;
 use Drupal\openid_connect\OpenIDConnectClaims;
@@ -68,11 +68,11 @@ class LoginForm extends FormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state): array {
     // Add the registration explanation message.
-    $explanation = $this->config('ocha_entraid.settings')->get('login_explanation');
-    if (!empty($explanation)) {
+    if (!UserMessage::LOGIN_EXPLANATION->empty()) {
       $form['login_explanation'] = [
         '#type' => 'markup',
-        '#markup' => Markup::create($explanation),
+
+        '#markup' => UserMessage::LOGIN_EXPLANATION->label(),
         '#prefix' => '<div class="ocha-entraid-login-explanation">',
         '#suffix' => '</div>',
       ];
@@ -114,8 +114,12 @@ class LoginForm extends FormBase {
   public function validateForm(array &$form, FormStateInterface $form_state): void {
     $email = $form_state->getValue('email');
     // Ensure the input is a proper email address.
+    //
+    // Note: this is more lax than the registration email verification because
+    // this must accomodate accounts created outside of the UIMC registration
+    // and even the UN system.
     if (!filter_var($email, \FILTER_VALIDATE_EMAIL, \FILTER_FLAG_EMAIL_UNICODE)) {
-      $form_state->setErrorByName('email', $this->t('Invalid email address.'));
+      $form_state->setErrorByName('email', UserMessage::INVALID_EMAIL->label());
       return;
     }
 
@@ -127,11 +131,11 @@ class LoginForm extends FormBase {
     catch (AccountNotFoundException $exception) {
       // @todo we may want to give more instructions like checking the inbox
       // for any invitation email or to register a new account.
-      $form_state->setErrorByName('', $this->t("We couldn't find your account."));
+      $form_state->setErrorByName('', UserMessage::LOGIN_ACCOUNT_NOT_FOUND->label());
     }
     // For other exceptions (ex: API error), show a generic error message.
     catch (\Exception $exception) {
-      $form_state->setErrorByName('', $this->t('An error occured during the account verification. Please try again later or contact the administrator.'));
+      $form_state->setErrorByName('', UserMessage::LOGIN_ACCOUNT_VERIFICATION_ERROR->label());
     }
   }
 
@@ -163,7 +167,7 @@ class LoginForm extends FormBase {
     else {
       $this->getLogger('ocha_entraid')->error('OpenID Connect client "entraid" not found.');
 
-      $this->messenger()->addError($this->t('An error occurred during the login process. Please try again later or contact the administrator.'));
+      $this->messenger()->addError(UserMessage::LOGIN_ERROR->label());
 
       $form_state->setRedirect('ocha_entraid.form.login');
     }

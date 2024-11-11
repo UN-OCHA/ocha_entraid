@@ -6,8 +6,8 @@ namespace Drupal\ocha_entraid\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Render\Markup;
 use Drupal\honeypot\HoneypotService;
+use Drupal\ocha_entraid\Enum\UserMessage;
 use Drupal\ocha_entraid\Service\UimcApiClientInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -44,11 +44,10 @@ class RegistrationForm extends FormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state): array {
     // Add the registration explanation message.
-    $explanation = $this->config('ocha_entraid.settings')->get('registration_explanation');
-    if (!empty($explanation)) {
+    if (!UserMessage::REGISTRATION_EXPLANATION->empty()) {
       $form['registration_explanation'] = [
         '#type' => 'markup',
-        '#markup' => Markup::create($explanation),
+        '#markup' => UserMessage::REGISTRATION_EXPLANATION->label(),
         '#prefix' => '<div class="ocha-entraid-registration-explanation">',
         '#suffix' => '</div>',
       ];
@@ -104,23 +103,23 @@ class RegistrationForm extends FormBase {
     // Validate first name.
     $first_name = $form_state->getValue('first_name');
     if (preg_match('/^[a-zA-Z \'-]{1,30}$/', $first_name) !== 1) {
-      $form_state->setErrorByName('first_name', $this->t('First name must contain only letters, spaces, hyphens, or apostrophes and be no longer than 30 characters.'));
+      $form_state->setErrorByName('first_name', UserMessage::REGISTRATION_INVALID_FIRST_NAME->label());
     }
 
     // Validate last name.
     $last_name = $form_state->getValue('last_name');
     if (preg_match('/^[a-zA-Z \'-]{1,30}$/', $last_name) !== 1) {
-      $form_state->setErrorByName('last_name', $this->t('Last name must contain only letters, spaces, hyphens, or apostrophes and be no longer than 30 characters.'));
+      $form_state->setErrorByName('last_name', UserMessage::REGISTRATION_INVALID_LAST_NAME->label());
     }
 
     // Validate email.
     $email = $form_state->getValue('email');
     if (strlen($email) > 100 || preg_match('/^[a-zA-Z0-9.-]{1,64}@[a-zA-Z0-9.-]{1,255}$/', $email) !== 1) {
-      $form_state->setErrorByName('email', $this->t('Email must contain only letters, numbers, hyphens, or periods and be no longer than 100 characters.'));
+      $form_state->setErrorByName('email', UserMessage::REGISTRATION_INVALID_EMAIL->label());
     }
     // Additional email validation.
     elseif (!filter_var($email, \FILTER_VALIDATE_EMAIL)) {
-      $form_state->setErrorByName('email', $this->t('Please enter a valid email address.'));
+      $form_state->setErrorByName('email', UserMessage::INVALID_EMAIL->label());
     }
   }
 
@@ -136,14 +135,20 @@ class RegistrationForm extends FormBase {
     try {
       $this->uimcApiClient->registerAccount($first_name, $last_name, $email);
 
-      $this->messenger()->addStatus($this->t('Registration successful, please check your mailbox for further instructions.'));
+      $send_email = $this->config('ocha_entraid.settings')?->get('uimc_api.send_email');
+      if (empty($send_email)) {
+        $this->messenger()->addStatus(UserMessage::REGISTRATION_SUCCESS->label());
+      }
+      else {
+        $this->messenger()->addStatus(UserMessage::REGISTRATION_SUCCESS_WITH_EMAIL->label());
+      }
 
       $form_state->setRedirect('user.login');
     }
     catch (\Exception $exception) {
       $this->getLogger('ocha_entraid')->error('Registration failed: @message', ['@message' => $exception->getMessage()]);
 
-      $this->messenger()->addError($this->t('Registration failed, please contact the administrator or try again later.'));
+      $this->messenger()->addError(UserMessage::REGISTRATION_FAILURE->label());
     }
   }
 

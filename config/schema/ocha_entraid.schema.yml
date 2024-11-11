@@ -45,9 +45,43 @@ ocha_entraid.settings:
         encryption_key:
           type;: string
           label: '256 bits encryption key used to encrypt the access tokens.'
-    login_explanation:
-      type: string
-      label: 'Explanation about the sign in process. Simple HTML is accepted.'
-    registration_explanation:
-      type: string
-      label: 'Explanation about the registration process. Simple HTML is accepted.'
+    messages:
+      type: mapping
+      label: 'User messages'
+      mapping:
+        invalid_email:
+          type: string
+          label: 'Message for invalid email address.'
+        login_explanation:
+          type: text
+          label: 'Explanation text for the login process.'
+        login_account_not_found:
+          type: string
+          label: 'Message when account is not found during login.'
+        login_account_verification_error:
+          type: string
+          label: 'Message for account verification error during login.'
+        login_error:
+          type: string
+          label: 'General error message for login process.'
+        registration_explanation:
+          type: text
+          label: 'Explanation text for the registration process.'
+        registration_invalid_first_name:
+          type: string
+          label: 'Message for invalid first name during registration.'
+        registration_invalid_last_name:
+          type: string
+          label: 'Message for invalid last name during registration.'
+        registration_invalid_email:
+          type: string
+          label: 'Message for invalid email during registration.'
+        registration_success:
+          type: string
+          label: 'Message for successful registration.'
+        registration_success_with_email:
+          type: string
+          label: 'Message for successful registration with email notification enabled.'
+        registration_failure:
+          type: string
+          label: 'Message for failed registration.'

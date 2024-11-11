@@ -14,6 +14,7 @@ use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Tests\UnitTestCase;
 use Drupal\honeypot\HoneypotService;
+use Drupal\ocha_entraid\Enum\UserMessage;
 use Drupal\ocha_entraid\Exception\AccountNotFoundException;
 use Drupal\ocha_entraid\Form\LoginForm;
 use Drupal\ocha_entraid\Service\UimcApiClientInterface;
@@ -22,6 +23,8 @@ use Drupal\openid_connect\OpenIDConnectClientEntityInterface;
 use Drupal\openid_connect\OpenIDConnectSessionInterface;
 use Drupal\openid_connect\Plugin\OpenIDConnectClientInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
@@ -82,11 +85,25 @@ class LoginFormTest extends UnitTestCase {
   protected ConfigFactoryInterface|MockObject $configFactory;
 
   /**
+   * The logger factory.
+   *
+   * @var \Drupal\Core\Logger\LoggerChannelFactoryInterface|\PHPUnit\Framework\MockObject\MockObject
+   */
+  protected LoggerChannelFactoryInterface|MockObject $loggerFactory;
+
+  /**
    * The configuration.
    *
    * @var \Drupal\Core\Config\ImmutableConfig|\PHPUnit\Framework\MockObject\MockObject
    */
   protected ImmutableConfig|MockObject $config;
+
+  /**
+   * The container used for the tests.
+   *
+   * @var \Symfony\Component\DependencyInjection\ContainerInterface
+   */
+  protected ContainerInterface $container;
 
   /**
    * The form object being tested.
@@ -101,30 +118,45 @@ class LoginFormTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
+    // Mock the services.
     $this->entityTypeManager = $this->createMock(EntityTypeManagerInterface::class);
     $this->openIdConnectClaims = $this->createMock(OpenIDConnectClaims::class);
     $this->openIdConnectSession = $this->createMock(OpenIDConnectSessionInterface::class);
     $this->uimcApiClient = $this->createMock(UimcApiClientInterface::class);
     $this->honeypotService = $this->createMock(HoneypotService::class);
     $this->messenger = $this->createMock(MessengerInterface::class);
+    $this->loggerFactory = $this->createMock(LoggerChannelFactoryInterface::class);
 
     // Mock the config factory.
     $this->configFactory = $this->createMock(ConfigFactoryInterface::class);
     $this->config = $this->createMock(ImmutableConfig::class);
     $this->configFactory->method('get')->willReturn($this->config);
 
-    $this->form = new LoginForm(
-      $this->entityTypeManager,
-      $this->openIdConnectClaims,
-      $this->openIdConnectSession,
-      $this->uimcApiClient,
-      $this->honeypotService
-    );
-    $this->form->setMessenger($this->messenger);
-    $this->form->setConfigFactory($this->configFactory);
-
+    // Mock the string translation service.
     $translation = $this->getStringTranslationStub();
-    $this->form->setStringTranslation($translation);
+
+    // Create a mock container using a service provider.
+    $container = new ContainerBuilder();
+
+    // Register the services.
+    $container->set('entity_type.manager', $this->entityTypeManager);
+    $container->set('openid_connect.claims', $this->openIdConnectClaims);
+    $container->set('openid_connect.session', $this->openIdConnectSession);
+    $container->set('ocha_entraid.uimc.api.client', $this->uimcApiClient);
+    $container->set('honeypot', $this->honeypotService);
+    $container->set('messenger', $this->messenger);
+    $container->set('config.factory', $this->configFactory);
+    $container->set('logger.factory', $this->loggerFactory);
+    $container->set('string_translation', $translation);
+
+    // Add our new container.
+    \Drupal::setContainer($container);
+
+    // Keep track of the container so we can update the config for example.
+    $this->container = $container;
+
+    // Create the form to test.
+    $this->form = LoginForm::create($container);
   }
 
   /**
@@ -137,24 +169,18 @@ class LoginFormTest extends UnitTestCase {
     $form_state = new FormState();
     $form_state->clearErrors();
 
-    $config = $this->createMock(ImmutableConfig::class);
-    $config->expects($this->once())
+    $this->config->expects($this->any())
       ->method('get')
-      ->with('login_explanation')
+      ->with('messages.login_explanation')
       ->willReturn('Test explanation');
-
-    $config_factory = $this->createMock(ConfigFactoryInterface::class);
-    $config_factory->expects($this->once())
-      ->method('get')
-      ->with('ocha_entraid.settings')
-      ->willReturn($config);
-
-    $this->form->setConfigFactory($config_factory);
 
     $built_form = $this->form->buildForm($form, $form_state);
 
     $this->assertArrayHasKey('login_explanation', $built_form);
-    $this->assertEquals('Test explanation', $built_form['login_explanation']['#markup']->__toString());
+
+    $expected = (string) UserMessage::LOGIN_EXPLANATION->label();
+    $this->assertEquals($expected, 'Test explanation');
+    $this->assertEquals($expected, (string) $built_form['login_explanation']['#markup']);
   }
 
   /**
@@ -224,7 +250,8 @@ class LoginFormTest extends UnitTestCase {
     $this->assertTrue($form_state->hasAnyErrors());
 
     $errors = $form_state->getErrors();
-    $this->assertStringContainsString("We couldn't find your account.", (string) reset($errors));
+    $expected = (string) UserMessage::LOGIN_ACCOUNT_NOT_FOUND->label();
+    $this->assertStringContainsString($expected, (string) reset($errors));
   }
 
   /**
@@ -247,7 +274,8 @@ class LoginFormTest extends UnitTestCase {
     $this->assertTrue($form_state->hasAnyErrors());
 
     $errors = $form_state->getErrors();
-    $this->assertStringContainsString('An error occured during the account verification', (string) reset($errors));
+    $expected = (string) UserMessage::LOGIN_ACCOUNT_VERIFICATION_ERROR->label();
+    $this->assertStringContainsString($expected, (string) reset($errors));
   }
 
   /**
@@ -389,7 +417,7 @@ class LoginFormTest extends UnitTestCase {
     $this->messenger->expects($this->once())
       ->method('addError')
       ->with($this->callback(function ($message) {
-        $expected_string = 'An error occurred during the login process. Please try again later or contact the administrator.';
+        $expected_string = (string) UserMessage::LOGIN_ERROR->label();
         $actual_string = $message->getUntranslatedString();
         if ($expected_string !== $actual_string) {
           $this->fail("Expected message '$expected_string', but got '$actual_string'");
