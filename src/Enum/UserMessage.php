@@ -13,9 +13,10 @@ enum UserMessage: string {
 
   case INVALID_EMAIL = 'invalid_email';
   case LOGIN_EXPLANATION = 'login_explanation';
+  case LOGIN_ACCOUNT_BLOCKED = 'login_account_blocked';
   case LOGIN_ACCOUNT_NOT_FOUND = 'login_account_not_found';
   case LOGIN_ACCOUNT_VERIFICATION_ERROR = 'login_account_verification_error';
-  case LOGIN_ERROR = 'login_error';
+  case LOGIN_REDIRECTION_ERROR = 'login_redirection_error';
   case REGISTRATION_EXPLANATION = 'registration_explanation';
   case REGISTRATION_INVALID_FIRST_NAME = 'registration_invalid_first_name';
   case REGISTRATION_INVALID_LAST_NAME = 'registration_invalid_last_name';

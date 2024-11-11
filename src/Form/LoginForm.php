@@ -123,6 +123,16 @@ class LoginForm extends FormBase {
       return;
     }
 
+    // Check if there is already an account with that email address and if it
+    // is blocked, in which case we show an error.
+    $user = $this->entityTypeManager->getStorage('user')->loadByProperties([
+      'mail' => $email,
+    ]);
+    if (isset($user) && $user->isBlocked()) {
+      $form_state->setErrorByName('', UserMessage::LOGIN_ACCOUNT_BLOCKED->label());
+      return;
+    }
+
     // Try to add the email to the default group for the site if not already.
     try {
       $this->uimcApiClient->addAccountToGroup($email);
@@ -167,7 +177,7 @@ class LoginForm extends FormBase {
     else {
       $this->getLogger('ocha_entraid')->error('OpenID Connect client "entraid" not found.');
 
-      $this->messenger()->addError(UserMessage::LOGIN_ERROR->label());
+      $this->messenger()->addError(UserMessage::LOGIN_REDIRECTION_ERROR->label());
 
       $form_state->setRedirect('ocha_entraid.form.login');
     }

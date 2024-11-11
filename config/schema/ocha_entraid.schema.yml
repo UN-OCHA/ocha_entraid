@@ -55,15 +55,18 @@ ocha_entraid.settings:
         login_explanation:
           type: text
           label: 'Explanation text for the login process.'
+        login_account_blocked:
+          type: string
+          label: 'Message when account is blocked.'
         login_account_not_found:
           type: string
           label: 'Message when account is not found during login.'
         login_account_verification_error:
           type: string
           label: 'Message for account verification error during login.'
-        login_error:
+        login_redirection error:
           type: string
-          label: 'General error message for login process.'
+          label: 'Message for an error during the redirection to Microsoft sign in page.'
         registration_explanation:
           type: text
           label: 'Explanation text for the registration process.'

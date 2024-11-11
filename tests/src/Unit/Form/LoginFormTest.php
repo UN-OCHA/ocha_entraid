@@ -22,6 +22,7 @@ use Drupal\openid_connect\OpenIDConnectClaims;
 use Drupal\openid_connect\OpenIDConnectClientEntityInterface;
 use Drupal\openid_connect\OpenIDConnectSessionInterface;
 use Drupal\openid_connect\Plugin\OpenIDConnectClientInterface;
+use Drupal\user\UserInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -231,6 +232,40 @@ class LoginFormTest extends UnitTestCase {
   }
 
   /**
+   * Tests the form validation with blocked account.
+   *
+   * @covers ::validateForm
+   */
+  public function testValidateFormWithBlockedAccount(): void {
+    $form = ['email' => ['#parents' => ['email']]];
+    $form_state = new FormState();
+    $form_state->clearErrors();
+    $form_state->setValues(['email' => 'nonexistent@example.com']);
+
+    $user = $this->createMock(UserInterface::class);
+    $user->expects($this->once())
+      ->method('isBlocked')
+      ->willReturn(TRUE);
+
+    $storage = $this->createMock(EntityStorageInterface::class);
+    $storage->expects($this->once())
+      ->method('loadByProperties')
+      ->willReturn($user);
+
+    $this->entityTypeManager->expects($this->once())
+      ->method('getStorage')
+      ->willReturn($storage);
+
+    $this->form->validateForm($form, $form_state);
+
+    $this->assertTrue($form_state->hasAnyErrors());
+
+    $errors = $form_state->getErrors();
+    $expected = (string) UserMessage::LOGIN_ACCOUNT_BLOCKED->label();
+    $this->assertStringContainsString($expected, (string) reset($errors));
+  }
+
+  /**
    * Tests the form validation with non-existent account.
    *
    * @covers ::validateForm
@@ -240,6 +275,15 @@ class LoginFormTest extends UnitTestCase {
     $form_state = new FormState();
     $form_state->clearErrors();
     $form_state->setValues(['email' => 'nonexistent@example.com']);
+
+    $storage = $this->createMock(EntityStorageInterface::class);
+    $storage->expects($this->once())
+      ->method('loadByProperties')
+      ->willReturn(NULL);
+
+    $this->entityTypeManager->expects($this->once())
+      ->method('getStorage')
+      ->willReturn($storage);
 
     $this->uimcApiClient->expects($this->once())
       ->method('addAccountToGroup')
@@ -265,6 +309,20 @@ class LoginFormTest extends UnitTestCase {
     $form_state->clearErrors();
     $form_state->setValues(['email' => 'valid@example.com']);
 
+    $user = $this->createMock(UserInterface::class);
+    $user->expects($this->once())
+      ->method('isBlocked')
+      ->willReturn(FALSE);
+
+    $storage = $this->createMock(EntityStorageInterface::class);
+    $storage->expects($this->once())
+      ->method('loadByProperties')
+      ->willReturn($user);
+
+    $this->entityTypeManager->expects($this->once())
+      ->method('getStorage')
+      ->willReturn($storage);
+
     $this->uimcApiClient->expects($this->once())
       ->method('addAccountToGroup')
       ->willThrowException(new \Exception('API Error'));
@@ -288,6 +346,20 @@ class LoginFormTest extends UnitTestCase {
     $form_state = new FormState();
     $form_state->clearErrors();
     $form_state->setValues(['email' => 'valid@example.com']);
+
+    $user = $this->createMock(UserInterface::class);
+    $user->expects($this->once())
+      ->method('isBlocked')
+      ->willReturn(FALSE);
+
+    $storage = $this->createMock(EntityStorageInterface::class);
+    $storage->expects($this->once())
+      ->method('loadByProperties')
+      ->willReturn($user);
+
+    $this->entityTypeManager->expects($this->once())
+      ->method('getStorage')
+      ->willReturn($storage);
 
     $this->uimcApiClient->expects($this->once())
       ->method('addAccountToGroup')
@@ -405,19 +477,19 @@ class LoginFormTest extends UnitTestCase {
     $form_state->setValues(['email' => 'user@example.com']);
 
     $storage = $this->createMock(EntityStorageInterface::class);
+    $storage->expects($this->once())
+      ->method('loadByProperties')
+      ->willReturn([]);
+
     $this->entityTypeManager->expects($this->once())
       ->method('getStorage')
       ->with('openid_connect_client')
       ->willReturn($storage);
 
-    $storage->expects($this->once())
-      ->method('loadByProperties')
-      ->willReturn([]);
-
     $this->messenger->expects($this->once())
       ->method('addError')
       ->with($this->callback(function ($message) {
-        $expected_string = (string) UserMessage::LOGIN_ERROR->label();
+        $expected_string = (string) UserMessage::LOGIN_REDIRECTION_ERROR->label();
         $actual_string = $message->getUntranslatedString();
         if ($expected_string !== $actual_string) {
           $this->fail("Expected message '$expected_string', but got '$actual_string'");
