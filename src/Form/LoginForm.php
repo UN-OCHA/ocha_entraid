@@ -157,8 +157,12 @@ class LoginForm extends FormBase {
       ->getStorage('openid_connect_client')
       ->loadByProperties(['id' => 'entraid', 'status' => 1]);
 
-    // Redirect to the EntraID sign-in page if we found the EntraID client.
+    // Redirect to the Entra ID sign-in page if we found the Entra ID client.
     if (isset($client_entities['entraid'])) {
+      // Ensure the user will be redirected to the correct page set up in
+      // OpenID Connect settings after completing the login process.
+      $this->openIdConnectSession->saveDestination();
+
       /** @var \Drupal\openid_connect\OpenIDConnectClientEntityInterface $client */
       $client = $client_entities['entraid'];
       $plugin = $client->getPlugin();
@@ -166,7 +170,7 @@ class LoginForm extends FormBase {
       $this->openIdConnectSession->saveOp('login');
 
       // Add the login_hint parameter with the email address to prepopulate the
-      // account field on the EntraID sign-in form.
+      // account field on the Entra ID sign-in form.
       $response = $plugin->authorize($scopes, [
         'login_hint' => $form_state->getValue('email'),
       ]);
