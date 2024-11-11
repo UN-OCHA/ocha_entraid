@@ -1,6 +1,6 @@
 ocha_entraid.settings:
   type: config_object
-  label: 'OCHA EntraID settings'
+  label: 'OCHA Entra ID settings'
   mapping:
     uimc_api:
       type: mapping
@@ -50,41 +50,41 @@ ocha_entraid.settings:
       label: 'User messages'
       mapping:
         invalid_email:
-          type: string
+          type: label
           label: 'Message for invalid email address.'
         login_explanation:
           type: text
           label: 'Explanation text for the login process.'
         login_account_blocked:
-          type: string
+          type: label
           label: 'Message when account is blocked.'
         login_account_not_found:
-          type: string
+          type: label
           label: 'Message when account is not found during login.'
         login_account_verification_error:
-          type: string
+          type: label
           label: 'Message for account verification error during login.'
         login_redirection error:
-          type: string
+          type: label
           label: 'Message for an error during the redirection to Microsoft sign in page.'
         registration_explanation:
           type: text
           label: 'Explanation text for the registration process.'
         registration_invalid_first_name:
-          type: string
+          type: label
           label: 'Message for invalid first name during registration.'
         registration_invalid_last_name:
-          type: string
+          type: label
           label: 'Message for invalid last name during registration.'
         registration_invalid_email:
-          type: string
+          type: label
           label: 'Message for invalid email during registration.'
         registration_success:
-          type: string
+          type: label
           label: 'Message for successful registration.'
         registration_success_with_email:
-          type: string
+          type: label
           label: 'Message for successful registration with email notification enabled.'
         registration_failure:
-          type: string
+          type: label
           label: 'Message for failed registration.'
