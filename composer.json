@@ -1,6 +1,6 @@
 {
     "name": "unocha/ocha_entraid",
-    "description": "OCHA EntraID module",
+    "description": "OCHA Entra ID module",
     "type": "drupal-module",
     "license": "GPL-2.0-or-later",
     "authors": [

@@ -252,7 +252,7 @@ class UimcApiClientTest extends UnitTestCase {
     $this->setLogger(FALSE);
 
     $this->httpClient->request('POST', 'https://api.example.com/group', Argument::any())
-      ->willReturn(new Response(200, [], '{"code": 400, "message": "User already member of given group"}'));
+      ->willReturn(new Response(200, [], '{"code": 400, "message": "' . UimcApiClient::USER_ALREADY_IN_GROUP . '"}'));
 
     $result = $this->apiClient->addAccountToGroup('john.doe@example.com', 'test_group');
     $this->assertTrue($result);
@@ -269,7 +269,7 @@ class UimcApiClientTest extends UnitTestCase {
     $this->setLogger(FALSE);
 
     $this->httpClient->request('POST', 'https://api.example.com/group', Argument::any())
-      ->willReturn(new Response(200, [], '{"code": 400, "message": "User not found"}'));
+      ->willReturn(new Response(200, [], '{"code": 400, "message": "' . UimcApiClient::USER_NOT_FOUND . '"}'));
 
     $this->expectException(AccountNotFoundException::class);
     $this->expectExceptionMessage('User not found: nonexistent@example.com');

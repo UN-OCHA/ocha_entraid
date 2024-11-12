@@ -21,6 +21,16 @@ use GuzzleHttp\Exception\RequestException;
 class UimcApiClient implements UimcApiClientInterface {
 
   /**
+   * UIMC API error message when user is already in a group.
+   */
+  public const string USER_ALREADY_IN_GROUP = 'User already member of given group';
+
+  /**
+   * UIMC API error message when user is not found.
+   */
+  public const string USER_NOT_FOUND = 'User not found';
+
+  /**
    * Constructs a new AccessTokenManager object.
    *
    * @param \GuzzleHttp\ClientInterface $httpClient
@@ -204,9 +214,9 @@ class UimcApiClient implements UimcApiClientInterface {
         // The account was successfully added to the group.
         $message_code === 204 => NULL,
         // The account is already in the group.
-        $message_code === 400 && $message_message === 'User already member of given group' => NULL,
+        $message_code === 400 && $message_message === self::USER_ALREADY_IN_GROUP => NULL,
         // The account was not found.
-        $message_code === 400 && $message_message === 'User not found' => new AccountNotFoundException($message_message . ': ' . $email),
+        $message_code === 400 && $message_message === self::USER_NOT_FOUND => new AccountNotFoundException($message_message . ': ' . $email),
         // Any other problem.
         default => new \Exception($message_message ?: $response_body, $message_code),
       };

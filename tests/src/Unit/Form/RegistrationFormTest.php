@@ -12,9 +12,12 @@ use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Tests\UnitTestCase;
 use Drupal\honeypot\HoneypotService;
+use Drupal\ocha_entraid\Enum\UserMessage;
 use Drupal\ocha_entraid\Form\RegistrationForm;
 use Drupal\ocha_entraid\Service\UimcApiClientInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Unit tests for the RegistrationForm.
@@ -29,7 +32,7 @@ class RegistrationFormTest extends UnitTestCase {
    *
    * @var \Drupal\ocha_entraid\Service\UimcApiClientInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected UimcApiClientInterface|MockObject $apiClient;
+  protected UimcApiClientInterface|MockObject $uimcApiClient;
 
   /**
    * The mocked Honeypot service.
@@ -59,6 +62,20 @@ class RegistrationFormTest extends UnitTestCase {
    */
   protected ImmutableConfig|MockObject $config;
 
+  /**
+   * The logger factory.
+   *
+   * @var \Drupal\Core\Logger\LoggerChannelFactoryInterface|\PHPUnit\Framework\MockObject\MockObject
+   */
+  protected LoggerChannelFactoryInterface|MockObject $loggerFactory;
+
+
+  /**
+   * The container used for the tests.
+   *
+   * @var \Symfony\Component\DependencyInjection\ContainerInterface
+   */
+  protected ContainerInterface $container;
 
   /**
    * The form object being tested.
@@ -73,24 +90,39 @@ class RegistrationFormTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->apiClient = $this->createMock(UimcApiClientInterface::class);
+    // Mock the services.
+    $this->uimcApiClient = $this->createMock(UimcApiClientInterface::class);
     $this->honeypotService = $this->createMock(HoneypotService::class);
     $this->messenger = $this->createMock(MessengerInterface::class);
+    $this->loggerFactory = $this->createMock(LoggerChannelFactoryInterface::class);
 
     // Mock the config factory.
     $this->configFactory = $this->createMock(ConfigFactoryInterface::class);
     $this->config = $this->createMock(ImmutableConfig::class);
     $this->configFactory->method('get')->willReturn($this->config);
 
-    $this->form = new RegistrationForm(
-      $this->apiClient,
-      $this->honeypotService,
-    );
-    $this->form->setMessenger($this->messenger);
-    $this->form->setConfigFactory($this->configFactory);
-
+    // Mock the string translation service.
     $translation = $this->getStringTranslationStub();
-    $this->form->setStringTranslation($translation);
+
+    // Create a mock container using a service provider.
+    $container = new ContainerBuilder();
+
+    // Register the services.
+    $container->set('ocha_entraid.uimc.api.client', $this->uimcApiClient);
+    $container->set('honeypot', $this->honeypotService);
+    $container->set('messenger', $this->messenger);
+    $container->set('config.factory', $this->configFactory);
+    $container->set('logger.factory', $this->loggerFactory);
+    $container->set('string_translation', $translation);
+
+    // Add our new container.
+    \Drupal::setContainer($container);
+
+    // Keep track of the container so we can update the config for example.
+    $this->container = $container;
+
+    // Create the form to test.
+    $this->form = RegistrationForm::create($container);
   }
 
   /**
@@ -134,24 +166,17 @@ class RegistrationFormTest extends UnitTestCase {
     $form_state = new FormState();
     $form_state->clearErrors();
 
-    $config = $this->createMock(ImmutableConfig::class);
-    $config->expects($this->once())
+    $this->config->expects($this->any())
       ->method('get')
-      ->with('registration_explanation')
+      ->with('messages.registration_explanation')
       ->willReturn('Test explanation');
-
-    $config_factory = $this->createMock(ConfigFactoryInterface::class);
-    $config_factory->expects($this->once())
-      ->method('get')
-      ->with('ocha_entraid.settings')
-      ->willReturn($config);
-
-    $this->form->setConfigFactory($config_factory);
 
     $built_form = $this->form->buildForm($form, $form_state);
 
     $this->assertArrayHasKey('registration_explanation', $built_form);
-    $this->assertEquals('Test explanation', $built_form['registration_explanation']['#markup']->__toString());
+
+    $expected = (string) UserMessage::REGISTRATION_EXPLANATION->label();
+    $this->assertEquals($expected, (string) $built_form['registration_explanation']['#markup']);
   }
 
   /**
@@ -219,14 +244,14 @@ class RegistrationFormTest extends UnitTestCase {
       'email' => 'john.doe@example.com',
     ]);
 
-    $this->apiClient->expects($this->once())
+    $this->uimcApiClient->expects($this->once())
       ->method('registerAccount')
       ->willThrowException(new \Exception('API Error'));
 
     $this->messenger->expects($this->once())
       ->method('addError')
       ->with($this->callback(function ($message) {
-        $expected_string = 'Registration failed, please contact the administrator or try again later.';
+        $expected_string = (string) UserMessage::REGISTRATION_FAILURE->label();
         $actual_string = $message->getUntranslatedString();
         if ($expected_string !== $actual_string) {
           $this->fail("Expected message '$expected_string', but got '$actual_string'");
@@ -239,13 +264,10 @@ class RegistrationFormTest extends UnitTestCase {
       ->method('error')
       ->with('Registration failed: @message', ['@message' => 'API Error']);
 
-    $logger_factory = $this->createMock(LoggerChannelFactoryInterface::class);
-    $logger_factory->expects($this->once())
+    $this->loggerFactory->expects($this->once())
       ->method('get')
       ->with('ocha_entraid')
       ->willReturn($logger);
-
-    $this->form->setLoggerFactory($logger_factory);
 
     $this->form->submitForm($form, $form_state);
   }
@@ -265,7 +287,22 @@ class RegistrationFormTest extends UnitTestCase {
       'email' => 'john.doe@example.com',
     ]);
 
-    $this->apiClient->expects($this->once())
+    $this->config->method('get')->will(
+      $this->returnCallback(function ($key) {
+        switch ($key) {
+          case 'uimc_api.send_email':
+            return FALSE;
+
+          case 'messages.registration_success':
+            return 'Registration success';
+
+          default:
+            return NULL;
+        }
+      })
+    );
+
+    $this->uimcApiClient->expects($this->once())
       ->method('registerAccount')
       ->with('John', 'Doe', 'john.doe@example.com')
       ->willReturn(TRUE);
@@ -273,7 +310,7 @@ class RegistrationFormTest extends UnitTestCase {
     $this->messenger->expects($this->once())
       ->method('addStatus')
       ->with($this->callback(function ($message) {
-        $expected_string = 'Registration successful, please check your mailbox for further instructions.';
+        $expected_string = (string) UserMessage::REGISTRATION_SUCCESS->label();
         $actual_string = $message->getUntranslatedString();
         if ($expected_string !== $actual_string) {
           $this->fail("Expected message '$expected_string', but got '$actual_string'");
@@ -283,7 +320,58 @@ class RegistrationFormTest extends UnitTestCase {
 
     $this->form->submitForm($form, $form_state);
 
-    $this->assertEquals('user.login', $form_state->getRedirect()->getRouteName());
+    $this->assertEquals('ocha_entraid.form.login', $form_state->getRedirect()->getRouteName());
+  }
+
+  /**
+   * Tests the form submission with successful API registration and email sent.
+   *
+   * @covers ::submitForm
+   */
+  public function testSubmitFormSuccessWithEmail(): void {
+    $form = [];
+    $form_state = new FormState();
+    $form_state->clearErrors();
+    $form_state->setValues([
+      'first_name' => 'John',
+      'last_name' => 'Doe',
+      'email' => 'john.doe@example.com',
+    ]);
+
+    $this->config->method('get')->will(
+      $this->returnCallback(function ($key) {
+        switch ($key) {
+          case 'uimc_api.send_email':
+            return TRUE;
+
+          case 'messages.registration_success_with_email':
+            return 'Registration success with email';
+
+          default:
+            return NULL;
+        }
+      })
+    );
+
+    $this->uimcApiClient->expects($this->once())
+      ->method('registerAccount')
+      ->with('John', 'Doe', 'john.doe@example.com')
+      ->willReturn(TRUE);
+
+    $this->messenger->expects($this->once())
+      ->method('addStatus')
+      ->with($this->callback(function ($message) {
+        $expected_string = (string) UserMessage::REGISTRATION_SUCCESS_WITH_EMAIL->label();
+        $actual_string = $message->getUntranslatedString();
+        if ($expected_string !== $actual_string) {
+          $this->fail("Expected message '$expected_string', but got '$actual_string'");
+        }
+        return TRUE;
+      }));
+
+    $this->form->submitForm($form, $form_state);
+
+    $this->assertEquals('ocha_entraid.form.login', $form_state->getRedirect()->getRouteName());
   }
 
   /**
@@ -293,6 +381,22 @@ class RegistrationFormTest extends UnitTestCase {
    */
   public function testGetFormId(): void {
     $this->assertEquals('ocha_entraid_registration_form', $this->form->getFormId());
+  }
+
+  /**
+   * Set the test config.
+   *
+   * @param array $config
+   *   The config data.
+   */
+  protected function setTestConfig(array $config): void {
+    $config_factory = $this->getConfigFactoryStub([
+      'ocha_entraid.settings' => $config,
+    ]);
+
+    $this->container->set('config.factory', $config_factory);
+
+    $this->form->setConfigFactory($config_factory);
   }
 
 }
