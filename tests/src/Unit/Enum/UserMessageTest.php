@@ -69,12 +69,12 @@ class UserMessageTest extends UnitTestCase {
     $this->configFactory->get('ocha_entraid.settings')->willReturn($config->reveal());
 
     // Test with a configured message.
-    $result = UserMessage::INVALID_EMAIL->label();
+    $result = UserMessage::InvalidEmail->label();
     $this->assertInstanceOf(TranslatableMarkup::class, $result);
     $this->assertEquals('Invalid email address', (string) $result);
 
     // Test with a non-configured message (fallback to enum value).
-    $result = UserMessage::LOGIN_REDIRECTION_ERROR->label();
+    $result = UserMessage::LoginRedirectionError->label();
     $this->assertInstanceOf(TranslatableMarkup::class, $result);
     $this->assertEquals('login_redirection_error', (string) $result);
   }
@@ -91,13 +91,13 @@ class UserMessageTest extends UnitTestCase {
     $this->configFactory->get('ocha_entraid.settings')->willReturn($config->reveal());
 
     // Test with a non-empty configured message.
-    $this->assertFalse(UserMessage::INVALID_EMAIL->empty());
+    $this->assertFalse(UserMessage::InvalidEmail->empty());
 
     // Test with a NULL configured message.
-    $this->assertTrue(UserMessage::LOGIN_REDIRECTION_ERROR->empty());
+    $this->assertTrue(UserMessage::LoginRedirectionError->empty());
 
     // Test with an empty string configured message.
-    $this->assertTrue(UserMessage::REGISTRATION_SUCCESS->empty());
+    $this->assertTrue(UserMessage::RegistrationSuccess->empty());
   }
 
 }

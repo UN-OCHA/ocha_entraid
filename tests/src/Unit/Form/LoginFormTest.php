@@ -179,7 +179,7 @@ class LoginFormTest extends UnitTestCase {
 
     $this->assertArrayHasKey('login_explanation', $built_form);
 
-    $expected = (string) UserMessage::LOGIN_EXPLANATION->label();
+    $expected = (string) UserMessage::LoginExplanation->label();
     $this->assertEquals($expected, 'Test explanation');
     $this->assertEquals($expected, (string) $built_form['login_explanation']['#markup']);
   }
@@ -261,7 +261,7 @@ class LoginFormTest extends UnitTestCase {
     $this->assertTrue($form_state->hasAnyErrors());
 
     $errors = $form_state->getErrors();
-    $expected = (string) UserMessage::LOGIN_ACCOUNT_BLOCKED->label();
+    $expected = (string) UserMessage::LoginAccountBlocked->label();
     $this->assertStringContainsString($expected, (string) reset($errors));
   }
 
@@ -294,7 +294,7 @@ class LoginFormTest extends UnitTestCase {
     $this->assertTrue($form_state->hasAnyErrors());
 
     $errors = $form_state->getErrors();
-    $expected = (string) UserMessage::LOGIN_ACCOUNT_NOT_FOUND->label();
+    $expected = (string) UserMessage::LoginAccountNotFound->label();
     $this->assertStringContainsString($expected, (string) reset($errors));
   }
 
@@ -332,7 +332,7 @@ class LoginFormTest extends UnitTestCase {
     $this->assertTrue($form_state->hasAnyErrors());
 
     $errors = $form_state->getErrors();
-    $expected = (string) UserMessage::LOGIN_ACCOUNT_VERIFICATION_ERROR->label();
+    $expected = (string) UserMessage::LoginAccountVerificationError->label();
     $this->assertStringContainsString($expected, (string) reset($errors));
   }
 
@@ -491,7 +491,7 @@ class LoginFormTest extends UnitTestCase {
     $this->messenger->expects($this->once())
       ->method('addError')
       ->with($this->callback(function ($message) {
-        $expected_string = (string) UserMessage::LOGIN_REDIRECTION_ERROR->label();
+        $expected_string = (string) UserMessage::LoginRedirectionError->label();
         $actual_string = $message->getUntranslatedString();
         if ($expected_string !== $actual_string) {
           $this->fail("Expected message '$expected_string', but got '$actual_string'");

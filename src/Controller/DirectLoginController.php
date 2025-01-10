@@ -92,7 +92,7 @@ class DirectLoginController extends ControllerBase implements ContainerInjection
         '@message' => $exception->getMessage(),
       ]));
 
-      $this->messenger()->addError(UserMessage::LOGIN_REDIRECTION_ERROR->label());
+      $this->messenger()->addError(UserMessage::LoginRedirectionError->label());
 
       // Redirect to the homepage.
       return $this->redirect('<front>');
