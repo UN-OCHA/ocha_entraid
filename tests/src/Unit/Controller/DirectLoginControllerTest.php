@@ -234,7 +234,7 @@ class DirectLoginControllerTest extends UnitTestCase {
 
     $this->messenger->expects($this->once())
       ->method('addError')
-      ->with(UserMessage::LOGIN_REDIRECTION_ERROR->label());
+      ->with(UserMessage::LoginRedirectionError->label());
 
     // Homepage.
     $this->urlGenerator

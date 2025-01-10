@@ -175,7 +175,7 @@ class RegistrationFormTest extends UnitTestCase {
 
     $this->assertArrayHasKey('registration_explanation', $built_form);
 
-    $expected = (string) UserMessage::REGISTRATION_EXPLANATION->label();
+    $expected = (string) UserMessage::RegistrationExplanation->label();
     $this->assertEquals($expected, (string) $built_form['registration_explanation']['#markup']);
   }
 
@@ -251,7 +251,7 @@ class RegistrationFormTest extends UnitTestCase {
     $this->messenger->expects($this->once())
       ->method('addError')
       ->with($this->callback(function ($message) {
-        $expected_string = (string) UserMessage::REGISTRATION_FAILURE->label();
+        $expected_string = (string) UserMessage::RegistrationFailure->label();
         $actual_string = $message->getUntranslatedString();
         if ($expected_string !== $actual_string) {
           $this->fail("Expected message '$expected_string', but got '$actual_string'");
@@ -310,7 +310,7 @@ class RegistrationFormTest extends UnitTestCase {
     $this->messenger->expects($this->once())
       ->method('addStatus')
       ->with($this->callback(function ($message) {
-        $expected_string = (string) UserMessage::REGISTRATION_SUCCESS->label();
+        $expected_string = (string) UserMessage::RegistrationSuccess->label();
         $actual_string = $message->getUntranslatedString();
         if ($expected_string !== $actual_string) {
           $this->fail("Expected message '$expected_string', but got '$actual_string'");
@@ -361,7 +361,7 @@ class RegistrationFormTest extends UnitTestCase {
     $this->messenger->expects($this->once())
       ->method('addStatus')
       ->with($this->callback(function ($message) {
-        $expected_string = (string) UserMessage::REGISTRATION_SUCCESS_WITH_EMAIL->label();
+        $expected_string = (string) UserMessage::RegistrationSuccessWithEmail->label();
         $actual_string = $message->getUntranslatedString();
         if ($expected_string !== $actual_string) {
           $this->fail("Expected message '$expected_string', but got '$actual_string'");
