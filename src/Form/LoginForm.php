@@ -68,11 +68,11 @@ class LoginForm extends FormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state): array {
     // Add the registration explanation message.
-    if (!UserMessage::LOGIN_EXPLANATION->empty()) {
+    if (!UserMessage::LoginExplanation->empty()) {
       $form['login_explanation'] = [
         '#type' => 'markup',
 
-        '#markup' => UserMessage::LOGIN_EXPLANATION->label(),
+        '#markup' => UserMessage::LoginExplanation->label(),
         '#prefix' => '<div class="ocha-entraid-login-explanation">',
         '#suffix' => '</div>',
       ];
@@ -119,7 +119,7 @@ class LoginForm extends FormBase {
     // this must accomodate accounts created outside of the UIMC registration
     // and even the UN system.
     if (!filter_var($email, \FILTER_VALIDATE_EMAIL, \FILTER_FLAG_EMAIL_UNICODE)) {
-      $form_state->setErrorByName('email', UserMessage::INVALID_EMAIL->label());
+      $form_state->setErrorByName('email', UserMessage::InvalidEmail->label());
       return;
     }
 
@@ -129,7 +129,7 @@ class LoginForm extends FormBase {
       'mail' => $email,
     ]);
     if (!empty($users) && reset($users)->isBlocked()) {
-      $form_state->setErrorByName('', UserMessage::LOGIN_ACCOUNT_BLOCKED->label());
+      $form_state->setErrorByName('', UserMessage::LoginAccountBlocked->label());
       return;
     }
 
@@ -141,11 +141,11 @@ class LoginForm extends FormBase {
     catch (AccountNotFoundException $exception) {
       // @todo we may want to give more instructions like checking the inbox
       // for any invitation email or to register a new account.
-      $form_state->setErrorByName('', UserMessage::LOGIN_ACCOUNT_NOT_FOUND->label());
+      $form_state->setErrorByName('', UserMessage::LoginAccountNotFound->label());
     }
     // For other exceptions (ex: API error), show a generic error message.
     catch (\Exception $exception) {
-      $form_state->setErrorByName('', UserMessage::LOGIN_ACCOUNT_VERIFICATION_ERROR->label());
+      $form_state->setErrorByName('', UserMessage::LoginAccountVerificationError->label());
     }
   }
 
@@ -181,7 +181,7 @@ class LoginForm extends FormBase {
     else {
       $this->getLogger('ocha_entraid')->error('OpenID Connect client "entraid" not found.');
 
-      $this->messenger()->addError(UserMessage::LOGIN_REDIRECTION_ERROR->label());
+      $this->messenger()->addError(UserMessage::LoginRedirectionError->label());
 
       $form_state->setRedirect('ocha_entraid.form.login');
     }

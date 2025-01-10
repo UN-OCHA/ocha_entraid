@@ -44,10 +44,10 @@ class RegistrationForm extends FormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state): array {
     // Add the registration explanation message.
-    if (!UserMessage::REGISTRATION_EXPLANATION->empty()) {
+    if (!UserMessage::RegistrationExplanation->empty()) {
       $form['registration_explanation'] = [
         '#type' => 'markup',
-        '#markup' => UserMessage::REGISTRATION_EXPLANATION->label(),
+        '#markup' => UserMessage::RegistrationExplanation->label(),
         '#prefix' => '<div class="ocha-entraid-registration-explanation">',
         '#suffix' => '</div>',
       ];
@@ -103,23 +103,23 @@ class RegistrationForm extends FormBase {
     // Validate first name.
     $first_name = $form_state->getValue('first_name');
     if (preg_match('/^[a-zA-Z \'-]{1,30}$/', $first_name) !== 1) {
-      $form_state->setErrorByName('first_name', UserMessage::REGISTRATION_INVALID_FIRST_NAME->label());
+      $form_state->setErrorByName('first_name', UserMessage::RegistrationInvalidFirstName->label());
     }
 
     // Validate last name.
     $last_name = $form_state->getValue('last_name');
     if (preg_match('/^[a-zA-Z \'-]{1,30}$/', $last_name) !== 1) {
-      $form_state->setErrorByName('last_name', UserMessage::REGISTRATION_INVALID_LAST_NAME->label());
+      $form_state->setErrorByName('last_name', UserMessage::RegistrationInvalidLastName->label());
     }
 
     // Validate email.
     $email = $form_state->getValue('email');
     if (strlen($email) > 100 || preg_match('/^[a-zA-Z0-9.-]{1,64}@[a-zA-Z0-9.-]{1,255}$/', $email) !== 1) {
-      $form_state->setErrorByName('email', UserMessage::REGISTRATION_INVALID_EMAIL->label());
+      $form_state->setErrorByName('email', UserMessage::RegistrationInvalidEmail->label());
     }
     // Additional email validation.
     elseif (!filter_var($email, \FILTER_VALIDATE_EMAIL)) {
-      $form_state->setErrorByName('email', UserMessage::INVALID_EMAIL->label());
+      $form_state->setErrorByName('email', UserMessage::InvalidEmail->label());
     }
   }
 
@@ -137,10 +137,10 @@ class RegistrationForm extends FormBase {
 
       $send_email = $this->config('ocha_entraid.settings')?->get('uimc_api.send_email');
       if (empty($send_email)) {
-        $this->messenger()->addStatus(UserMessage::REGISTRATION_SUCCESS->label());
+        $this->messenger()->addStatus(UserMessage::RegistrationSuccess->label());
       }
       else {
-        $this->messenger()->addStatus(UserMessage::REGISTRATION_SUCCESS_WITH_EMAIL->label());
+        $this->messenger()->addStatus(UserMessage::RegistrationSuccessWithEmail->label());
       }
 
       $form_state->setRedirect('ocha_entraid.form.login');
@@ -148,7 +148,7 @@ class RegistrationForm extends FormBase {
     catch (\Exception $exception) {
       $this->getLogger('ocha_entraid')->error('Registration failed: @message', ['@message' => $exception->getMessage()]);
 
-      $this->messenger()->addError(UserMessage::REGISTRATION_FAILURE->label());
+      $this->messenger()->addError(UserMessage::RegistrationFailure->label());
     }
   }
 
