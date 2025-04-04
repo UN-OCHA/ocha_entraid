@@ -17,8 +17,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        drupal-core: ['10.3.x']
-        php-versions: ['8.3']
+        drupal-core: ['10.4.x', '11.1.x']
+        php-versions: ['8.3', '8.4']
+        exclude:
+          - drupal-core: '10.4.x'
+            php-versions: '8.4'
+
     steps:
       - name: Checkout Drupal core
         uses: actions/checkout@v4
@@ -61,7 +65,7 @@ jobs:
           echo "DRUPAL_ROOT=$GITHUB_WORKSPACE" >> $GITHUB_ENV
 
       - name: Install drush
-        run: composer require "drush/drush ^12.0"
+        run: composer require "drush/drush"
 
       - name: Start MySql service
         run: |
