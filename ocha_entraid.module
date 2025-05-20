@@ -13,7 +13,7 @@
  */
 function ocha_entraid_preprocess_status_messages(&$variables) {
 
-  $messages = $variables['message_list'];
+  $messages = $variables['message_list'] ?? [];
   if (empty($messages)) {
     return;
   }
