@@ -1,0 +1,44 @@
+<?php
+
+/**
+ * @file
+ * The ocha_entraid module file.
+ */
+
+/**
+ * Implements hook_preprocess_status_messages().
+ *
+ * If the current user is not active, ensure we do not display the EntraID Login error message.
+ */
+function ocha_entraid_preprocess_status_messages(&$variables) {
+
+  $messages = $variables['message_list'];
+  if (empty($messages))
+    return;
+
+  // Only filter the error if the account is blocked.
+  $account = \Drupal::currentUser();
+  if (!$account->isBlocked()) {
+    return;
+  }
+
+  // Load the oidc client so we can use the label.
+  $client_entities = \Drupal::entityTypeManager()->getStorage('openid_connect_client')->loadByProperties(['id' => 'entraid']);
+  if (!isset($client_entities['entraid'])) {
+    return;
+  }
+
+  $client = $client_entities['entraid'];
+  $provider_param = ['@provider' => $client->label()];
+
+  // Cycle through the list and remove the openid_connect error if present.
+  foreach ($messages as $type => $list) {
+    foreach ($list as $key => $message) {
+      if ($message === t('Logging in with @provider could not be completed due to an error.', $provider_param)) {
+        unset($messages[$type][$key]);
+      }
+    }
+  }
+
+  $variables['message_list'] = $messages;
+}
