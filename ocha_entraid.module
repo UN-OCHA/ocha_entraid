@@ -5,6 +5,8 @@
  * The ocha_entraid module file.
  */
 
+use Drupal\user\Entity\User;
+
 /**
  * Implements hook_preprocess_status_messages().
  *
@@ -19,8 +21,8 @@ function ocha_entraid_preprocess_status_messages(&$variables) {
   }
 
   // Only filter the error if the account is blocked.
-  $account = \Drupal::currentUser();
-  if (!$account->isBlocked()) {
+  $account = User::load(\Drupal::currentUser()->id());
+  if (!$account || !$account->isBlocked()) {
     return;
   }
 
