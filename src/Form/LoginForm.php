@@ -96,7 +96,7 @@ class LoginForm extends FormBase {
     $form['create_account'] = [
       '#type' => 'link',
       '#title' => $this->t('Create a new account'),
-      '#url' => Url::fromRoute('ocha_entraid.form.registration'),
+      '#url' => Url::fromRoute('ocha_entraid.registration.form'),
       '#prefix' => '<div class="ocha-entraid-register">',
       '#suffix' => '</div>',
       '#weight' => 100,
