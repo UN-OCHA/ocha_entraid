@@ -81,8 +81,7 @@ class LoginController extends ControllerBase {
 
     // Yes, this needs to come from config (file or db)
     $message = $this->t(
-      "<p><strong><a href=\"@login-direct\">Log in with your UN Agency email</a></strong></p>p>UN Secretariat and UN Agency personnel can use their email credentials to log in. Everyone else should use Humanitarian ID.</p>" .
-      "<p><strong><a href=\"@login-form\">Log In with non-UN email</a> / <a href=\"@register\">Create new account</a></strong></p>",
+      '<p><strong><a href="@login-direct">Log in with your UN Agency email</a></strong></p>p>UN Secretariat and UN Agency personnel can use their email credentials to log in. Everyone else should use Humanitarian ID.</p><p><strong><a href="@login-form">Log In with non-UN email</a> / <a href="@register">Create new account</a></strong></p>',
       $params
     );
 
