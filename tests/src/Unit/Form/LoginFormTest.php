@@ -27,6 +27,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Unit tests for the LoginForm.
@@ -70,6 +71,13 @@ class LoginFormTest extends UnitTestCase {
    * @var \Drupal\honeypot\HoneypotService|\PHPUnit\Framework\MockObject\MockObject
    */
   protected HoneypotService|MockObject $honeypotService;
+
+  /**
+   * The mocked RequestStack service.
+   *
+   * @var \Symfony\Component\HttpFoundation\RequestStack|\PHPUnit\Framework\MockObject\MockObject
+   */
+  protected RequestStack|MockObject $requestStack;
 
   /**
    * The mocked messenger service.
@@ -125,6 +133,7 @@ class LoginFormTest extends UnitTestCase {
     $this->openIdConnectSession = $this->createMock(OpenIDConnectSessionInterface::class);
     $this->uimcApiClient = $this->createMock(UimcApiClientInterface::class);
     $this->honeypotService = $this->createMock(HoneypotService::class);
+    $this->requestStack = $this->createMock(RequestStack::class);
     $this->messenger = $this->createMock(MessengerInterface::class);
     $this->loggerFactory = $this->createMock(LoggerChannelFactoryInterface::class);
 
@@ -145,6 +154,7 @@ class LoginFormTest extends UnitTestCase {
     $container->set('openid_connect.session', $this->openIdConnectSession);
     $container->set('ocha_entraid.uimc.api.client', $this->uimcApiClient);
     $container->set('honeypot', $this->honeypotService);
+    $container->set('request_stack', $this->requestStack);
     $container->set('messenger', $this->messenger);
     $container->set('config.factory', $this->configFactory);
     $container->set('logger.factory', $this->loggerFactory);
