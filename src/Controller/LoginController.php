@@ -7,8 +7,10 @@ namespace Drupal\ocha_entraid\Controller;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,7 +18,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Render a login page with configurable content.
  */
-class LoginController extends ControllerBase {
+class LoginController extends ControllerBase implements ContainerInjectionInterface {
   use StringTranslationTrait;
 
   /**
