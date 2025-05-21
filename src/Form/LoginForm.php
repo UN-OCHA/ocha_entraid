@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\ocha_entraid\Form;
 
+use Drupal\Component\Utility\Html;
+use Drupal\Component\Utility\Xss;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -15,6 +17,8 @@ use Drupal\ocha_entraid\Service\UimcApiClientInterface;
 use Drupal\openid_connect\OpenIDConnectClaims;
 use Drupal\openid_connect\OpenIDConnectSessionInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Provides a login form for the ocha_entraid module.
@@ -34,6 +38,8 @@ class LoginForm extends FormBase {
    *   The UIMC API client.
    * @param \Drupal\honeypot\HoneypotService $honeypotService
    *   The Honeypot service.
+   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   *   The request stack.
    */
   public function __construct(
     protected EntityTypeManagerInterface $entityTypeManager,
@@ -41,6 +47,7 @@ class LoginForm extends FormBase {
     protected OpenIDConnectSessionInterface $openIdConnectSession,
     protected UimcApiClientInterface $uimcApiClient,
     protected HoneypotService $honeypotService,
+    protected RequestStack $requestStack,
   ) {}
 
   /**
@@ -53,6 +60,7 @@ class LoginForm extends FormBase {
       $container->get('openid_connect.session'),
       $container->get('ocha_entraid.uimc.api.client'),
       $container->get('honeypot'),
+      $container->get('request_stack'),
     );
   }
 
@@ -84,6 +92,16 @@ class LoginForm extends FormBase {
       '#required' => TRUE,
       '#placeholder' => $this->t('Enter your email address'),
     ];
+
+    // Re-use the destination param if we were given one.
+    // But not if it contains a protocol part!
+    $destination = $this->requestStack->getCurrentRequest()->query->get('destination') ?? '';
+    if (!empty($destination)) {
+      $form['destination'] = [
+        '#type'  => 'hidden',
+        '#value' => Html::normalize(Xss::filter($destination, [])),
+      ];
+    }
 
     $form['actions']['#type'] = 'actions';
     $form['actions']['submit'] = [

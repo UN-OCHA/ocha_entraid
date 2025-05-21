@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\ocha_entraid\Controller;
 
+use Drupal\Component\Utility\Html;
+use Drupal\Component\Utility\Xss;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
@@ -68,7 +70,7 @@ class LoginController extends ControllerBase {
     // Get the destination param. Re-use if *if* set.
     $destination = $request->query->get('destination');
     if (isset($destination)) {
-      $options['destination'] = $destination;
+      $options['destination'] = Html::normalize(Xss::filter($destination, []));
     }
 
     $params = [
