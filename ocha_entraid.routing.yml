@@ -1,13 +1,12 @@
-ocha_entraid.form.registration:
-  path: '/user/register/entraid'
+ocha_entraid.login:
+  path: '/user/login'
   defaults:
-    _form: '\Drupal\ocha_entraid\Form\RegistrationForm'
-    _title: 'Register account'
+    _controller: '\Drupal\ocha_entraid\Controller\LoginController::loginPage'
+    _title: 'Log in or register'
   requirements:
     _user_is_logged_in: 'FALSE'
-    _permission: access ocha entraid registration form
 
-ocha_entraid.form.login:
+ocha_entraid.login.form:
   path: '/user/login/entraid'
   defaults:
     _form: '\Drupal\ocha_entraid\Form\LoginForm'
@@ -16,7 +15,7 @@ ocha_entraid.form.login:
     _user_is_logged_in: 'FALSE'
     _permission: access ocha entraid login form
 
-ocha_entraid.login:
+ocha_entraid.login.direct:
   path: '/user/login/entraid-direct'
   defaults:
     _controller: '\Drupal\ocha_entraid\Controller\DirectLoginController::redirectLogin'
@@ -24,3 +23,12 @@ ocha_entraid.login:
   requirements:
     _user_is_logged_in: 'FALSE'
     _permission: access ocha entraid direct login
+
+ocha_entraid.registration.form:
+  path: '/user/register/entraid'
+  defaults:
+    _form: '\Drupal\ocha_entraid\Form\RegistrationForm'
+    _title: 'Register account'
+  requirements:
+    _user_is_logged_in: 'FALSE'
+    _permission: access ocha entraid registration form
