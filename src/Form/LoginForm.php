@@ -89,12 +89,15 @@ class LoginForm extends FormBase {
 
     // Re-use the destination param if we were given one.
     // But not if it contains a protocol part!
-    $destination = $this->getRequest()->query->get('destination') ?? '';
-    if (!empty($destination)) {
-      $form['destination'] = [
-        '#type'  => 'hidden',
-        '#value' => Html::normalize(Xss::filter($destination, [])),
-      ];
+    $request = $this->getRequest();
+    if ($request->query !== NULL) {
+      $destination = $request->query->get('destination') ?? '';
+      if (!empty($destination)) {
+        $form['destination'] = [
+          '#type'  => 'hidden',
+          '#value' => Html::normalize(Xss::filter($destination, [])),
+        ];
+      }
     }
 
     $form['actions']['#type'] = 'actions';
