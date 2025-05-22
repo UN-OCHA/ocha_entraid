@@ -13,27 +13,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class OchaEntraidConfigForm extends ConfigFormBase {
 
   /**
-   * Constructor.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory service.
-   */
-  public function __construct(
-    ConfigFactoryInterface $config_factory,
-  ) {
-    parent::__construct($config_factory);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('config.factory'),
-    );
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state): array {
@@ -41,7 +20,7 @@ class OchaEntraidConfigForm extends ConfigFormBase {
       '#type' => 'textarea',
       '#rows' => 20,
       '#title' => $this->t('Login Page'),
-      '#description' => $this->t('The content for the login page. This should include links to EntraID paths and/or signup forms.'
+      '#description' => $this->t('The content for the login page. This should include links to EntraID paths and/or signup forms.'),
     ];
 
     return parent::buildForm($form, $form_state);
