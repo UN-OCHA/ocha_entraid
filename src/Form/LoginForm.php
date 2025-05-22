@@ -87,8 +87,7 @@ class LoginForm extends FormBase {
       '#placeholder' => $this->t('Enter your email address'),
     ];
 
-    // Re-use the destination param if we were given one.
-    // But not if it contains a protocol part!
+    // Re-use the destination param if we were given one. But safely!
     $request = $this->getRequest();
     if ($request->query !== NULL) {
       $destination = $request->query->get('destination') ?? '';
@@ -186,8 +185,11 @@ class LoginForm extends FormBase {
 
       // Add the login_hint parameter with the email address to prepopulate the
       // account field on the Entra ID sign-in form.
+      // And add the destination parametsr, so we can redirect there after
+      // successful authentication, or the user page if not set.
       $response = $plugin->authorize($scopes, [
-        'login_hint' => $form_state->getValue('email'),
+        'destination' => $form_state->getValue('destination') ?? '/user',
+        'login_hint'  => $form_state->getValue('email'),
       ]);
 
       $form_state->setResponse($response);
