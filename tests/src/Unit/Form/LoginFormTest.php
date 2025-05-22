@@ -29,6 +29,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+
 /**
  * Unit tests for the LoginForm.
  *
@@ -75,9 +76,9 @@ class LoginFormTest extends UnitTestCase {
   /**
    * The mocked RequestStack service.
    *
-   * @var \Symfony\Component\HttpFoundation\RequestStack|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Symfony\Component\HttpFoundation\RequestStack
    */
-  protected RequestStack|MockObject $requestStack;
+  protected RequestStack $requestStack;
 
   /**
    * The mocked messenger service.
@@ -133,9 +134,11 @@ class LoginFormTest extends UnitTestCase {
     $this->openIdConnectSession = $this->createMock(OpenIDConnectSessionInterface::class);
     $this->uimcApiClient = $this->createMock(UimcApiClientInterface::class);
     $this->honeypotService = $this->createMock(HoneypotService::class);
-    $this->requestStack = $this->createMock(RequestStack::class);
     $this->messenger = $this->createMock(MessengerInterface::class);
     $this->loggerFactory = $this->createMock(LoggerChannelFactoryInterface::class);
+
+    // Do not mock the request stack, just use a real one.
+    $this->requestStack = new RequestStack();
 
     // Mock the config factory.
     $this->configFactory = $this->createMock(ConfigFactoryInterface::class);
