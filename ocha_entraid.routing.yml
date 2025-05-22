@@ -32,3 +32,14 @@ ocha_entraid.registration.form:
   requirements:
     _user_is_logged_in: 'FALSE'
     _permission: access ocha entraid registration form
+
+ocha_entraid.config_form:
+  path: '/admin/config/people/ocha-entraid'
+  defaults:
+    _form: '\Drupal\ocha_entraid\Form\OchaEntraidConfigForm'
+    _title: 'OCHA EntraID Configuration'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _user_is_logged_in: 'TRUE'
+    _permission: manage ocha entraid configuration
