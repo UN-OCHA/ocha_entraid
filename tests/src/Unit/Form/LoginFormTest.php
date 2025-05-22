@@ -27,6 +27,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -161,6 +162,10 @@ class LoginFormTest extends UnitTestCase {
     $container->set('config.factory', $this->configFactory);
     $container->set('logger.factory', $this->loggerFactory);
     $container->set('string_translation', $translation);
+
+    // Create the "current" request.
+    $request = new Request();
+    $this->requestStack->push($request);
 
     // Add our new container.
     \Drupal::setContainer($container);
@@ -447,7 +452,10 @@ class LoginFormTest extends UnitTestCase {
       ->method('authorize')
       ->with(
         $this->anything(),
-        $this->equalTo(['login_hint' => $email])
+        $this->equalTo([
+          'destination' => '/user',
+          'login_hint' => $email,
+        ])
       )
       ->willReturn($response);
 
