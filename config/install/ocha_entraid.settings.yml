@@ -28,3 +28,20 @@ messages:
   registration_success: 'Thank you for signing up. Please wait a moment and then log in to finalize your registration.'
   registration_success_with_email: 'Thank you for signing up! A confirmation email has been sent to your mailbox. Please check your email and follow the instructions to finalize your registration.'
   registration_failure: 'We encountered an issue while processing your registration. Please try again later or reach out for assistance.'
+login_page: |-
+  <p><em><a href="@login-direct">Log in with your UN Agency email</a><?em>
+  <p>UN Secretariat and UN Agency personnel can use their email credentials to log in. Everyone else should use Humanitarian ID.
+  <hr />
+  <p><em><a href="@login-form">Log In with non-UN email</a> / <a href="@register">Create new account</a></em>
+  <h2>Welcome to ReliefWeb!</h2>
+  <p><em>Unleash the power of humanitarian information!</em>
+  <p>To unlock additional features, you'll need an <a href="@register">Entra ID account</a>.
+  <p>With a registration with ReliefWeb, you'll be able to:
+  <ul>
+  <li><em>Manage your subscriptions</em> and stay updated with the latest ReliefWeb blog posts, headlines, appeals, jobs, training, disasters, situation reports and updates by selected countries.
+  <li><em>Bookmark your favorite content</em> for easy access anytime, anywhere.
+  <li><em><a href="https://reliefweb.int/blogpost/announcing-ask-reliefweb">Ask ReliefWeb</a></em>Our AI-powered chatbot allows you to ask questions about individual reports.
+  <li>If you're part of a humanitarian organization, you'll also have the privilege to <em>post and manage <a href="/help#job-publishing">jobs and <a href="/help#training-publishing">training</a></em> opportunities, reaching out to a global audience.
+  </ul>
+  <p>However, if you're here just to browse, no worries! You can explore ReliefWeb with <em>no limitations</em> without having an account. So, take a moment to think if you really need these additional features. 
+  <p>Join us today and become part of our global humanitarian network, or feel free to explore as a guest!
