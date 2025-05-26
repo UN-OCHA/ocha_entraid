@@ -27,6 +27,8 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Unit tests for the LoginForm.
@@ -70,6 +72,13 @@ class LoginFormTest extends UnitTestCase {
    * @var \Drupal\honeypot\HoneypotService|\PHPUnit\Framework\MockObject\MockObject
    */
   protected HoneypotService|MockObject $honeypotService;
+
+  /**
+   * The mocked RequestStack service.
+   *
+   * @var \Symfony\Component\HttpFoundation\RequestStack
+   */
+  protected RequestStack $requestStack;
 
   /**
    * The mocked messenger service.
@@ -128,6 +137,9 @@ class LoginFormTest extends UnitTestCase {
     $this->messenger = $this->createMock(MessengerInterface::class);
     $this->loggerFactory = $this->createMock(LoggerChannelFactoryInterface::class);
 
+    // Do not mock the request stack, just use a real one.
+    $this->requestStack = new RequestStack();
+
     // Mock the config factory.
     $this->configFactory = $this->createMock(ConfigFactoryInterface::class);
     $this->config = $this->createMock(ImmutableConfig::class);
@@ -145,10 +157,15 @@ class LoginFormTest extends UnitTestCase {
     $container->set('openid_connect.session', $this->openIdConnectSession);
     $container->set('ocha_entraid.uimc.api.client', $this->uimcApiClient);
     $container->set('honeypot', $this->honeypotService);
+    $container->set('request_stack', $this->requestStack);
     $container->set('messenger', $this->messenger);
     $container->set('config.factory', $this->configFactory);
     $container->set('logger.factory', $this->loggerFactory);
     $container->set('string_translation', $translation);
+
+    // Create the "current" request.
+    $request = new Request();
+    $this->requestStack->push($request);
 
     // Add our new container.
     \Drupal::setContainer($container);
@@ -435,7 +452,10 @@ class LoginFormTest extends UnitTestCase {
       ->method('authorize')
       ->with(
         $this->anything(),
-        $this->equalTo(['login_hint' => $email])
+        $this->equalTo([
+          'destination' => '/user',
+          'login_hint' => $email,
+        ])
       )
       ->willReturn($response);
 

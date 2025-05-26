@@ -88,3 +88,6 @@ ocha_entraid.settings:
         registration_failure:
           type: label
           label: 'Message for failed registration.'
+    login_page:
+      type: text
+      label: 'Login page content'
