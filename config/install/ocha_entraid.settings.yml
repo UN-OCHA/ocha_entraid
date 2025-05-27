@@ -25,6 +25,6 @@ messages:
   registration_invalid_first_name: 'First name must contain only letters, spaces, hyphens, or apostrophes and be no longer than 30 characters.'
   registration_invalid_last_name: 'Last name must contain only letters, spaces, hyphens, or apostrophes and be no longer than 30 characters.'
   registration_invalid_email: 'Email must contain only letters, numbers, hyphens, or periods and be no longer than 100 characters.'
-  registration_success: 'Thank you for signing up. Please wait a moment and then log in to finalize your registration.'
+  registration_success: 'Thank you for signing up. Please wait a few minutes and then log in to finalize your registration.'
   registration_success_with_email: 'Thank you for signing up! A confirmation email has been sent to your mailbox. Please check your email and follow the instructions to finalize your registration.'
   registration_failure: 'We encountered an issue while processing your registration. Please try again later or reach out for assistance.'
